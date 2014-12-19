@@ -1,6 +1,13 @@
 #include "face.h"
 
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/nonfree/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/nonfree/nonfree.hpp"
+
 using namespace std;
+using namespace cv;
 
 class FACE::FACEPimpl {
 public:
@@ -27,6 +34,24 @@ void FACE::startTraining() {
 /// @param img:  250x250 pixel image containing a scaled and aligned face
 /// @param name: name of the person who corresponds to img
 void FACE::train(const cv::Mat3b& img, const string& name) {
+    
+    int minHessian = 400;
+    
+    SurfFeatureDetector detector( minHessian );
+    
+    std::vector<KeyPoint> keypoints_1;
+    
+    detector.detect( img, keypoints_1 );
+    
+    //-- Draw keypoints
+    Mat img_keypoints_1;
+    
+    drawKeypoints( img, keypoints_1, img_keypoints_1, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
+
+    
+    //-- Show detected (drawn) keypoints
+    imshow("Keypoints ", img_keypoints_1 );
+    waitKey(600);
 	
 	pimpl->centerColor[name] = img(124,124);
 }
